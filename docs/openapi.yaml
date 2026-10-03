@@ -1,0 +1,308 @@
+openapi: 3.0.3
+info:
+  title: go-production-http-server
+  version: "1.0.0"
+  description: |
+    API of the demonstration HTTP service. Behavior here is verified against the
+    implementation by the test suite and by manual runs of the built binary.
+
+    Authentication: when the server is started with AUTH_TOKEN, every /api/
+    operation requires a bearer token. This is a PLACEHOLDER mechanism (one static
+    shared secret) and not production authentication. When AUTH_TOKEN is unset the
+    API is open. /health/* and /metrics never require credentials.
+
+    Errors detected by net/http before dispatch (for example 431 for oversized
+    headers) are plain text and do not use the Error schema.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: operations
+  - name: work
+paths:
+  /health/live:
+    get:
+      tags: [operations]
+      summary: Liveness probe
+      description: Reports 200 while the process can serve HTTP. Checks nothing else.
+      responses:
+        "200":
+          description: Alive
+          headers:
+            X-Request-ID: {$ref: "#/components/headers/RequestID"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Status"}
+              example: {status: ok}
+  /health/ready:
+    get:
+      tags: [operations]
+      summary: Readiness probe
+      description: 200 only when the instance should receive traffic. 503 while starting or draining. Draining is terminal.
+      responses:
+        "200":
+          description: Ready
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Status"}
+              example: {status: ready}
+        "503":
+          description: Starting or draining
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Status"}
+              example: {status: draining}
+  /metrics:
+    get:
+      tags: [operations]
+      summary: In-process metrics snapshot (JSON, not Prometheus format)
+      responses:
+        "200":
+          description: Snapshot
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Metrics"}
+  /api/v1/info:
+    get:
+      tags: [work]
+      summary: Build and runtime information
+      security: [{bearerAuth: []}, {}]
+      responses:
+        "200":
+          description: Info
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Info"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+  /api/v1/work:
+    get:
+      tags: [work]
+      summary: Run a batch synchronously with bounded concurrency
+      description: |
+        Runs `items` independent simulated work items concurrently (at most
+        WORK_BATCH_CONCURRENCY at a time) under the request context. Each item waits
+        `delay_ms` and returns index squared; `checksum` is the sum.
+      security: [{bearerAuth: []}, {}]
+      parameters:
+        - name: items
+          in: query
+          schema: {type: integer, default: 10, minimum: 1, maximum: 1000}
+          description: Upper bound is WORK_MAX_ITEMS (default 1000).
+        - name: delay_ms
+          in: query
+          schema: {type: integer, default: 10, minimum: 0, maximum: 1000}
+          description: Upper bound is WORK_MAX_ITEM_DELAY in milliseconds (default 1000).
+      responses:
+        "200":
+          description: Batch completed
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/BatchResult"}
+              example: {items: 10, checksum: 285, concurrency: 8, elapsed_ms: 40.7}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "499":
+          description: Client disconnected (non-standard code, recorded server-side; the client never receives it).
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+        "500": {$ref: "#/components/responses/Internal"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+        "504":
+          description: Request deadline exceeded
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+    post:
+      tags: [work]
+      summary: Submit an asynchronous job
+      description: |
+        Accepts the job and returns 202 immediately. The job runs on a bounded worker
+        pool under the pool's context, not the request's. Jobs are held in memory and
+        are lost on restart. Not idempotent.
+      security: [{bearerAuth: []}, {}]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SubmitRequest"}
+            example: {items: 5, delay_ms: 10}
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Location:
+              schema: {type: string}
+              description: URL of the job, /api/v1/work/{id}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Job"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "413":
+          description: Body exceeds HTTP_MAX_BODY_BYTES (default 65536)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+        "415":
+          description: Content-Type is not application/json
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+        "500": {$ref: "#/components/responses/Internal"}
+        "503": {$ref: "#/components/responses/Unavailable"}
+  /api/v1/work/{id}:
+    get:
+      tags: [work]
+      summary: Get a job
+      security: [{bearerAuth: []}, {}]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: The job
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Job"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404":
+          description: Unknown or evicted job
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: PLACEHOLDER static shared secret, enforced only when AUTH_TOKEN is set. Not production authentication.
+  headers:
+    RequestID:
+      description: Request identifier; a valid inbound X-Request-ID is echoed, otherwise generated.
+      schema: {type: string}
+  responses:
+    BadRequest:
+      description: Invalid request (codes invalid_request or malformed_json)
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        WWW-Authenticate:
+          schema: {type: string}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    Internal:
+      description: Unexpected failure (generic message; details are in the server log)
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    Unavailable:
+      description: Overloaded (queue or store full) or shutting down. Retry later.
+      headers:
+        Retry-After:
+          schema: {type: string}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+  schemas:
+    Status:
+      type: object
+      required: [status]
+      properties:
+        status: {type: string, enum: [ok, ready, starting, draining]}
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - invalid_request
+                - malformed_json
+                - unauthorized
+                - not_found
+                - method_not_allowed
+                - request_timeout
+                - payload_too_large
+                - unsupported_media_type
+                - client_closed_request
+                - internal_error
+                - overloaded
+                - unavailable
+                - timeout
+            message: {type: string}
+            request_id: {type: string}
+    Info:
+      type: object
+      properties:
+        service: {type: string}
+        version: {type: string}
+        go_version: {type: string}
+        started_at: {type: string, format: date-time}
+        uptime_seconds: {type: number}
+        goroutines: {type: integer}
+        gomaxprocs: {type: integer}
+    BatchResult:
+      type: object
+      properties:
+        items: {type: integer}
+        checksum: {type: integer, format: int64}
+        concurrency: {type: integer}
+        elapsed_ms: {type: number}
+    SubmitRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        items: {type: integer, default: 10, minimum: 1, maximum: 1000}
+        delay_ms: {type: integer, default: 10, minimum: 0, maximum: 1000}
+    Job:
+      type: object
+      required: [id, status, items, delay_ms, created_at]
+      properties:
+        id: {type: string}
+        status: {type: string, enum: [queued, running, succeeded, failed, canceled]}
+        items: {type: integer}
+        delay_ms: {type: integer, format: int64}
+        created_at: {type: string, format: date-time}
+        started_at: {type: string, format: date-time}
+        finished_at: {type: string, format: date-time}
+        result: {$ref: "#/components/schemas/BatchResult"}
+        failure: {type: string, enum: [internal_error, canceled]}
+    Metrics:
+      type: object
+      properties:
+        requests_total: {type: integer, format: int64}
+        requests_in_flight: {type: integer, format: int64}
+        active_connections: {type: integer, format: int64}
+        responses_by_class:
+          type: object
+          additionalProperties: {type: integer, format: int64}
+        client_errors_total: {type: integer, format: int64}
+        server_errors_total: {type: integer, format: int64}
+        latency:
+          type: object
+          properties:
+            count: {type: integer, format: int64}
+            sum_seconds: {type: number}
+            buckets:
+              type: array
+              items:
+                type: object
+                properties:
+                  le_seconds: {type: number}
+                  count: {type: integer, format: int64}
+            p50_seconds: {type: number}
+            p95_seconds: {type: number}
+            p99_seconds: {type: number}
+        gauges:
+          type: object
+          additionalProperties: {type: integer, format: int64}
