@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
 )
 
 // cancelWindowFraction is the share of the shutdown budget reserved for the

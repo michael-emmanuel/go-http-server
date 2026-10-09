@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
 )
 
 // WorkService is the slice of application behavior the handlers need. It is

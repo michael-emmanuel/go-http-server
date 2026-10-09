@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/example/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
 )
 
 func benchRouter(b *testing.B) http.Handler {

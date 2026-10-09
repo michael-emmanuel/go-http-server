@@ -3,7 +3,7 @@ package httpapi
 import (
 	"net/http"
 
-	"github.com/example/go-production-http-server/internal/health"
+	"github.com/michael-emmanuel/go-production-http-server/internal/health"
 )
 
 // RouteDeps are the collaborators needed to build the route table.

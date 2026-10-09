@@ -13,7 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/worker"
+	"github.com/michael-emmanuel/go-production-http-server/internal/worker"
 )
 
 // Executor runs background tasks. It is satisfied by *worker.Pool. The

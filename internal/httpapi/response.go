@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/example/go-production-http-server/internal/domain"
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 // StatusClientClosedRequest is the de-facto status (popularized by nginx) for

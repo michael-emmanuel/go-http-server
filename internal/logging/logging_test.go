@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 func decode(t *testing.T, buf *bytes.Buffer) map[string]any {

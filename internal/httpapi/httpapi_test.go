@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/domain"
-	"github.com/example/go-production-http-server/internal/health"
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/health"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 // fakeWork lets each test script the application layer's behavior.

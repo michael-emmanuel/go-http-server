@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/config"
-	"github.com/example/go-production-http-server/internal/domain"
-	"github.com/example/go-production-http-server/internal/logging"
-	"github.com/example/go-production-http-server/internal/server"
+	"github.com/michael-emmanuel/go-production-http-server/internal/config"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/logging"
+	"github.com/michael-emmanuel/go-production-http-server/internal/server"
 )
 
 // guard bounds how long a test waits for an event that must happen. It is a

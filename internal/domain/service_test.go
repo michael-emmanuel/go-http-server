@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/worker"
+	"github.com/michael-emmanuel/go-production-http-server/internal/worker"
 )
 
 var errBoom = errors.New("boom")

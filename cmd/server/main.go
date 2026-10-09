@@ -15,9 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/config"
-	"github.com/example/go-production-http-server/internal/logging"
-	"github.com/example/go-production-http-server/internal/server"
+	"github.com/michael-emmanuel/go-production-http-server/internal/config"
+	"github.com/michael-emmanuel/go-production-http-server/internal/logging"
+	"github.com/michael-emmanuel/go-production-http-server/internal/server"
 )
 
 // version is overridden at build time: -ldflags "-X main.version=1.2.3".

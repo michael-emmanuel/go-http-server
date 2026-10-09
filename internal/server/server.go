@@ -12,12 +12,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/config"
-	"github.com/example/go-production-http-server/internal/domain"
-	"github.com/example/go-production-http-server/internal/health"
-	"github.com/example/go-production-http-server/internal/httpapi"
-	"github.com/example/go-production-http-server/internal/metrics"
-	"github.com/example/go-production-http-server/internal/worker"
+	"github.com/michael-emmanuel/go-production-http-server/internal/config"
+	"github.com/michael-emmanuel/go-production-http-server/internal/domain"
+	"github.com/michael-emmanuel/go-production-http-server/internal/health"
+	"github.com/michael-emmanuel/go-production-http-server/internal/httpapi"
+	"github.com/michael-emmanuel/go-production-http-server/internal/metrics"
+	"github.com/michael-emmanuel/go-production-http-server/internal/worker"
 )
 
 // Option customizes a Server. Options exist for the few seams that tests and

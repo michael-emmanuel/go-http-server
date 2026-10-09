@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/httpapi"
-	"github.com/example/go-production-http-server/internal/metrics"
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/httpapi"
+	"github.com/michael-emmanuel/go-production-http-server/internal/metrics"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 // Middleware wraps a handler with additional behavior.

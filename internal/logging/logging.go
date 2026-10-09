@@ -6,7 +6,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 // New returns a JSON logger that automatically attaches the request ID found

@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/example/go-production-http-server/internal/metrics"
+	"github.com/michael-emmanuel/go-production-http-server/internal/metrics"
 )
 
 // discardLogger keeps the benchmark measuring middleware cost, not terminal I/O.

@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/example/go-production-http-server/internal/logging"
-	"github.com/example/go-production-http-server/internal/metrics"
-	"github.com/example/go-production-http-server/internal/requestid"
+	"github.com/michael-emmanuel/go-production-http-server/internal/logging"
+	"github.com/michael-emmanuel/go-production-http-server/internal/metrics"
+	"github.com/michael-emmanuel/go-production-http-server/internal/requestid"
 )
 
 func serve(h http.Handler, method, target string, headers ...string) *httptest.ResponseRecorder {
