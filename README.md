@@ -95,12 +95,12 @@ scripts/mutation-check.sh       optional mutation testing (see Testing)
 Dockerfile  Makefile  LICENSE
 ```
 
-The module path is `github.com/example/go-production-http-server`, a placeholder. To use your own:
+The module path is `github.com/michael-emmanuel/go-production-http-server`
 
 ```
-go mod edit -module github.com/YOU/go-production-http-server
-grep -rl 'github.com/example/go-production-http-server' --include='*.go' . | \
-  xargs sed -i 's#github.com/example/go-production-http-server#github.com/YOU/go-production-http-server#g'
+go mod edit -module github.com/michael-emmanuel/go-http-server
+grep -rl 'github.com/michael-emmanuel/go-http-server' --include='*.go' . | \
+  xargs sed -i 's#github.com/michael-emmanuel/go-http-server#github.com/michael-emmanuel/go-http-server#g'
 ```
 
 ## Getting started
@@ -108,8 +108,8 @@ grep -rl 'github.com/example/go-production-http-server' --include='*.go' . | \
 Requires Go 1.22 or newer (for `ServeMux` method and wildcard patterns).
 
 ```
-git clone https://github.com/YOU/go-production-http-server.git
-cd go-production-http-server
+git clone https://github.com/michael-emmanuel/go-http-server.git
+cd go-http-server
 go run ./cmd/server
 ```
 
